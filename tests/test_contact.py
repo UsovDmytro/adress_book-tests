@@ -3,7 +3,7 @@ from django.urls import reverse
 from rest_framework.test import APIClient
 from contact.models import Contact, ContactActivityLog, ContactGroup
 from contact.serializers import ContactSerializer, ContactGroupSerializer
-
+from django.db import IntegrityError
 
 @pytest.fixture
 def contact_factory():
@@ -90,3 +90,14 @@ def test_contact_mocked_delete(contact_factory, mocker):
     contact1.delete()
     mock_delete.assert_called()
     assert Contact.objects.all().count() == 1
+
+
+@pytest.mark.django_db
+def test_contact_mocked_create():
+    contact1 = Contact.objects.create(first_name="John", last_name="Doe")
+    try:
+        contact2 = Contact.objects.create(first_name="John", last_name="Doe")
+        assert False
+    except IntegrityError:
+        pass
+
