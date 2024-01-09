@@ -20,3 +20,15 @@ def test_activity_log_create(contact_factory):
        assert act_log.contact == contact1
     except:
         assert False
+
+@pytest.mark.django_db
+def test_activity_log_edit(contact_factory):
+    contact1 = contact_factory(first_name="John", city="NY")
+    contact2 = contact_factory(first_name="Jane", city="LA")
+    contact1.first_name = 'Doe'
+    contact1.save()
+    try:
+       act_log = ContactActivityLog.objects.get(contact=contact1, activity_type="EDITED")
+       assert act_log.contact == contact1
+    except:
+        assert False
