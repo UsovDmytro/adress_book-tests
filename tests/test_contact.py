@@ -81,3 +81,12 @@ def test_contactgroup_serializer(contact_factory, mocker):
     assert serialized.data["contacts"][0]['city'] == "NY"
     assert serialized.data["contacts"][1]['first_name'] == "Jane"
     assert serialized.data["contacts"][1]['city'] == "LA"
+
+
+@pytest.mark.django_db
+def test_contact_mocked_delete(contact_factory, mocker):
+    mock_delete = mocker.patch.object(Contact, 'delete', autospec=True)
+    contact1 = contact_factory(first_name="John", city="NY")
+    contact1.delete()
+    mock_delete.assert_called()
+    assert Contact.objects.all().count() == 1
