@@ -2,7 +2,7 @@ import pytest
 from django.urls import reverse
 from rest_framework.test import APIClient
 from contact.models import Contact, ContactActivityLog, ContactGroup
-from contact.serializers import ContactSerializer
+from contact.serializers import ContactSerializer, ContactGroupSerializer
 
 
 @pytest.fixture
@@ -65,3 +65,19 @@ def test_contactgroup_create(contact_factory, mocker):
         assert list(contactgroup_db.contacts.all()) == [contact1, contact2]
     except:
         assert False
+
+
+@pytest.mark.django_db
+def test_contactgroup_serializer(contact_factory, mocker):
+    contact1 = contact_factory(first_name="John", city="NY")
+    contact2 = contact_factory(first_name="Jane", city="LA")
+    contact_group = ContactGroup(name="group 1")
+    contact_group.save()
+    contact_group.contacts.add(contact1, contact2)
+    contact_group.save()
+    serialized = ContactGroupSerializer(contact_group)
+    assert serialized.data["name"] == "group 1"
+    assert serialized.data["contacts"][0]['first_name'] == "John"
+    assert serialized.data["contacts"][0]['city'] == "NY"
+    assert serialized.data["contacts"][1]['first_name'] == "Jane"
+    assert serialized.data["contacts"][1]['city'] == "LA"
