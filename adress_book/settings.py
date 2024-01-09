@@ -12,7 +12,10 @@ https://docs.djangoproject.com/en/4.2/ref/settings/
 import os
 from datetime import timedelta
 from pathlib import Path
+from dotenv import load_dotenv
+import os
 
+load_dotenv()
 # Build paths inside the project like this: BASE_DIR / 'subdir'.
 BASE_DIR = Path(__file__).resolve().parent.parent
 
@@ -82,9 +85,9 @@ WSGI_APPLICATION = "adress_book.wsgi.application"
 DATABASES = {
     'default': {
         'ENGINE': 'django.db.backends.postgresql_psycopg2',
-        'NAME': 'adrress_book',
+        'NAME': 'adrress_book_tests',
         'USER': 'postgres',
-        'PASSWORD': 'lover1999',
+        'PASSWORD': os.getenv('PASSWORD_POSTGRES'),
         'HOST': 'localhost',
         'PORT': '5432',
     }
