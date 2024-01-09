@@ -1,7 +1,7 @@
 import pytest
 from django.urls import reverse
 from rest_framework.test import APIClient
-from contact.models import Contact, ContactActivityLog
+from contact.models import Contact, ContactActivityLog, ContactGroup
 from contact.serializers import ContactSerializer
 
 
@@ -49,3 +49,19 @@ def test_contact_serializer(contact):
     assert serialized.data["url"] == "https://example.com"
     assert serialized.data["phone"] == "+1234567890"
     assert serialized.data["image"] is None  # якщо у вас є зображення, перевірте його URL тут
+
+
+@pytest.mark.django_db
+def test_contactgroup_create(contact_factory, mocker):
+    contact1 = contact_factory(first_name="John", city="NY")
+    contact2 = contact_factory(first_name="Jane", city="LA")
+    contact_group = ContactGroup(name="group 1")
+    contact_group.save()
+    contact_group.contacts.add(contact1, contact2)
+    contact_group.save()
+    assert ContactGroup.objects.all().count() == 1
+    try:
+        contactgroup_db = ContactGroup.objects.get(pk=contact_group.pk)
+        assert list(contactgroup_db.contacts.all()) == [contact1, contact2]
+    except:
+        assert False
